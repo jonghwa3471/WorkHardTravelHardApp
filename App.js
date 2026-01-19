@@ -1,6 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import {
   Alert,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -51,21 +52,31 @@ export default function App() {
     setText("");
   };
 
-  const deleteToDo = (key) => {
-    Alert.alert("Are you sure?", "Delete To Do", [
-      {
-        text: "No",
-      },
-      {
-        text: "Yes",
-        onPress: async () => {
-          const newToDos = { ...toDos };
-          delete newToDos[key];
-          setToDos(newToDos);
-          await saveToDos(newToDos);
+  const deleteToDo = async (key) => {
+    if (Platform.OS === "web") {
+      const ok = confirm("Are you sure?");
+      if (ok) {
+        const newToDos = { ...toDos };
+        delete newToDos[key];
+        setToDos(newToDos);
+        await saveToDos(newToDos);
+      }
+    } else {
+      Alert.alert("Are you sure?", "Delete To Do", [
+        {
+          text: "No",
         },
-      },
-    ]);
+        {
+          text: "Yes",
+          onPress: async () => {
+            const newToDos = { ...toDos };
+            delete newToDos[key];
+            setToDos(newToDos);
+            await saveToDos(newToDos);
+          },
+        },
+      ]);
+    }
   };
   console.log(toDos);
   return (
