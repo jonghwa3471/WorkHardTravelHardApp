@@ -1,5 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,6 +11,7 @@ import {
 import { theme } from "./colors";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Fontisto from "@expo/vector-icons/Fontisto";
 
 const STORAGE_KEY = "@toDos";
 
@@ -17,15 +19,19 @@ export default function App() {
   const [working, setWorking] = useState(true);
   const [text, setText] = useState("");
   const [toDos, setToDos] = useState({});
+
   useEffect(() => {
     loadToDos();
   }, []);
+
   const travel = () => setWorking(false);
   const work = () => setWorking(true);
   const onChangeText = (payload) => setText(payload);
+
   const saveToDos = async (toSave) => {
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
   };
+
   const loadToDos = async () => {
     const s = await AsyncStorage.getItem(STORAGE_KEY);
     const json = JSON.parse(s);
@@ -43,6 +49,23 @@ export default function App() {
     setToDos(newToDos);
     await saveToDos(newToDos);
     setText("");
+  };
+
+  const deleteToDo = (key) => {
+    Alert.alert("Are you sure?", "Delete To Do", [
+      {
+        text: "No",
+      },
+      {
+        text: "Yes",
+        onPress: async () => {
+          const newToDos = { ...toDos };
+          delete newToDos[key];
+          setToDos(newToDos);
+          await saveToDos(newToDos);
+        },
+      },
+    ]);
   };
   console.log(toDos);
   return (
@@ -84,6 +107,9 @@ export default function App() {
           toDos[key].working === working ? (
             <View style={styles.toDo} key={key}>
               <Text style={styles.toDoText}>{toDos[key].text}</Text>
+              <TouchableOpacity hitSlop={20} onPress={() => deleteToDo(key)}>
+                <Fontisto name="trash" size={16} color="whitesmoke" />
+              </TouchableOpacity>
             </View>
           ) : null,
         )}
@@ -121,10 +147,13 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 20,
     borderRadius: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   toDoText: {
     color: "white",
-    fontSize: 16,
+    fontSize: 22,
     fontWeight: "500",
   },
 });
