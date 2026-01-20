@@ -38,6 +38,9 @@
     },
     "updates": {
       "url": "https://u.expo.dev/d3cd7009-03e2-401c-b410-650ba794a49b"
+    },
+    "experiments": {
+      "baseUrl": "/WorkHardTravelHardApp"
     }
   }
 }
